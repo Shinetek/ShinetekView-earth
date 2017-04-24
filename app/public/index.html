@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>风场数据</title>
+
+    <link rel="shortcut icon" href="./image/shklogo.ico"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="./image/iphone-icon.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="./image/ipad-icon.png"/>
+    <link rel="stylesheet" type="text/css" href="./styles/styles.css"/>
+
+</head>
+<body>
+<!--用于主体显示的DIV-->
+<div id="display">
+    <svg id="map" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
+    <!--动画图层-->
+    <canvas id="animation" class="fill-screen"></canvas>
+    <!--覆盖区图层-->
+    <canvas id="overlay" class="fill-screen"></canvas>
+    <svg id="foreground" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
+</div>
+<!--显示菜单的div-->
+<div id="details">
+    <p id="status"></p>
+    <div id="location">
+        <p>
+            <span id="location-coord"></span>
+            <span id="location-close" class="invisible text-button"> ✕ </span>
+        </p>
+        <p>
+            <span id="location-wind"></span>
+            <span id="location-wind-units" class="text-button"></span>
+        </p>
+        <p>
+            <span id="location-value"></span>
+            <span id="location-value-units" class="text-button"></span>
+        </p>
+    </div>
+
+    <p id="earth">
+        <span id="show-menu" class="text-button" title="menu">菜单</span>
+        <span id="progress" class="invisible"></span>
+    </p>
+
+    <div id="menu" class="invisible">
+        <p>日期 | <span
+                id="data-date" class="local"></span> <span
+                id="toggle-zone" class="text-button"></span>
+        </p>
+        <p>数据 | <span id="data-layer"></span></p>
+        <p><span id="scale-label">调色板 | </span>
+            <canvas id="scale"></canvas>
+        </p>
+        <p>控制 | <span
+                class="text-button" id="nav-now" title="Current Conditions">Now</span><span
+                class="text-button" id="nav-backward-more"> « </span> – <span
+                class="text-button" id="nav-backward"> ‹ </span> – <span
+                class="text-button" id="nav-forward"> › </span> – <span
+                class="text-button" id="nav-forward-more"> » </span><span
+                class="text-button" id="option-show-grid" title="Toggle Grid">Grid</span>
+        </p>
+        <p>模式 | <span
+                class="text-button" id="wind-mode-enable">风</span> – <span
+                class="text-button" id="ocean-mode-enable">洋流</span>
+        </p>
+        <p class="wind-mode">风场高度 | <span
+                class="surface text-button" id="surface-level" title="Surface">Sfc</span> – <span
+                class="surface text-button" id="isobaric-1000hPa">1000</span> – <span
+                class="surface text-button" id="isobaric-850hPa">850</span> – <span
+                class="surface text-button" id="isobaric-700hPa">700</span> – <span
+                class="surface text-button" id="isobaric-500hPa">500</span> – <span
+                class="surface text-button" id="isobaric-250hPa">250</span> – <span
+                class="surface text-button" id="isobaric-70hPa">70</span> – <span
+                class="surface text-button" id="isobaric-10hPa">10</span> hPa
+        </p>
+        <p class="wind-mode">表面图层 | <span
+                class="text-button" id="overlay-off">None</span> – <span
+                class="text-button" id="overlay-wind" title="Wind Speed">Wind</span> – <span
+                class="text-button" id="overlay-temp" title="Temperature">Temp</span> – <span
+                class="text-button" id="overlay-relative_humidity" title="Relative Humidity">RH</span> – <span
+                class="text-button" id="overlay-air_density" title="Air Density">AD</span> – <span
+                class="text-button" id="overlay-wind_power_density" title="Wind Power Density">WPD</span>
+        </p>
+        <p class="wind-mode"><span style="visibility:hidden">Overlay</span> | <span
+                class="text-button" id="overlay-total_precipitable_water" title="Total Precipitable Water">TPW</span> – <span
+                class="text-button" id="overlay-total_cloud_water" title="Total Cloud Water">TCW</span> – <span
+                class="text-button" id="overlay-mean_sea_level_pressure" title="Mean Sea Level Pressure">MSLP</span>
+        </p>
+        <p class="ocean-mode invisible">Animate | <span
+                class="text-button" id="animate-currents" title="Currents">Currents</span>
+        </p>
+        <p class="ocean-mode invisible">Overlay | <span
+                class="text-button" id="overlay-ocean-off">None</span> – <span
+                class="text-button" id="overlay-currents" title="Currents">Currents</span>
+        </p>
+        <p class="ocean-mode invisible"><span style="visibility:hidden">Overlay</span> |</p>
+        <p>投影 | <span
+                class="proj text-button" id="atlantis" title="Atlantis">A</span> – <span
+                class="proj text-button" id="azimuthal_equidistant" title="Azimuthal Equidistant">AE</span> – <span
+                class="proj text-button" id="conic_equidistant" title="Conic Equidistant">CE</span> – <span
+                class="proj text-button" id="equirectangular" title="Equirectangular">E</span> – <span
+                class="proj text-button" id="orthographic" title="Orthographic">O</span> – <span
+                class="proj text-button" id="stereographic" title="Stereographic">S</span> – <span
+                class="proj text-button" id="waterman" title="Waterman Butterfly">WB</span> – <span
+                class="proj text-button" id="winkel3" title="Winkel Tripel">W3</span>
+        </p>
+        <!--<p>免責事項 | 正確な情報を提供するためのものではありません</p>-->
+
+        <p style="display: none;">
+            <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>
+            <a href="https://twitter.com/cambecc" class="social-icon" title="Twitter">&#xe086;</a>
+        </p>
+    </div>
+</div>
+<!--一些基础的 处理js-->
+
+<script src="./libs/underscore.js/1.6.0/underscore-min.js" charset="utf-8"></script>
+<script src="./libs/backbone.js/1.1.0/backbone-min.js" charset="utf-8"></script>
+<script src="./libs/topojson/1.1.0/topojson.min.js" charset="utf-8"></script>
+<script src="./libs/d3/3.3.10/d3.min.js" charset="utf-8"></script>
+
+<!--GEOJson 的 js-->
+<script src="./libs/d3.geo/0.0.0/d3.geo.projection.v0.min.js" charset="utf-8"></script>
+<script src="./libs/d3.geo/0.0.0/d3.geo.polyhedron.v0.min.js" charset="utf-8"></script>
+<script src="./libs/when/2.6.0/when.js" charset="utf-8"></script>
+
+<!--eatrh 处理的js-->
+
+<script src="./scripts/earth/micro.js" charset="utf-8"></script>
+<script src="./scripts/earth/globes.js" charset="utf-8"></script>
+<script src="./scripts/earth/products.js" charset="utf-8"></script>
+<script src="./scripts/earth/earth.js" charset="utf-8"></script>
+
+
+</body>
+</html>
