@@ -148,16 +148,17 @@ var products = function () {
                                 var m_u = null;
                                 if (µ.isValue(uData[i])) {
                                     //m_u = -uData[i] / 30;
-                                    if (uData[i] > 180) {
-                                        m_u = -uData[i] / 30;
+                                    m_u = (180 + uData[i]) % 360;
+                                    if (m_u >= 90 && m_u < 270) {
+                                        m_u = -(m_u / 20);
                                     }
                                     else {
-                                        m_u = uData[i] / 30;
+                                        m_u = (m_u / 20);
                                     }
                                 }
                                 var m_v = null;
                                 if (µ.isValue(m_u)) {
-                                    if (uData[i] < 270 || uData[i] > 90) {
+                                    if (uData[i] < 360 && uData[i] >= 180) {
                                         m_v = -vData[i];
                                     }
                                 }

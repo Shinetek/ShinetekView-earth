@@ -10,7 +10,7 @@
     "use strict";
 
     /**
-     *   一下大写字母为全局静态变量  基本为数值 且一般不会改变
+     *   以下大写字母为全局静态变量  基本为数值 且一般不会改变
      */
 
     var SECOND = 1000;
@@ -25,7 +25,7 @@
     var INTENSITY_SCALE_STEP = 10;            // step size of particle intensity color scale  比例尺颜色间隔
     var MAX_PARTICLE_AGE = 20;               // max number of frames a particle is drawn before regeneration  最大粒子间隔 100？todo
     var PARTICLE_LINE_WIDTH = 1.0;            // line width of a drawn particle
-    var PARTICLE_MULTIPLIER = 3;              // particle count scalar (completely arbitrary--this values looks nice) 粒子个数
+    var PARTICLE_MULTIPLIER = 10;              // particle count scalar (completely arbitrary--this values looks nice) 粒子个数
     var PARTICLE_REDUCTION = 0.75;            // reduce particle count to this much of normal for mobile devices
     var FRAME_RATE = 20;                      // desired milliseconds per frame 每一帧的刷新毫秒数
 
@@ -522,6 +522,7 @@
     function distort(projection, λ, φ, x, y, scale, wind) {
         var u = wind[0] * scale;
         var v = wind[1] * scale;
+
         //返回一个4个值的数组 0 1 2 3
         var d = µ.distortion(projection, λ, φ, x, y);
 
@@ -576,7 +577,7 @@
                             wind = interpolate(λ, φ);
                             var scalar = null;
                             if (wind) {
-                                //重新更新 wind[0] wind[1]
+                                //重新更新 wind[0] wind[1] x y 投影方式  坐标 经纬度 坐标
                                 wind = distort(projection, λ, φ, x, y, velocityScale, wind);
                                 //wind2 在插值中生成 interpolate 里面生成的么 interpolate
                                 scalar = wind[2];

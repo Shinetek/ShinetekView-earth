@@ -8,7 +8,8 @@ var Windy = function (a) {
         c = Math.pow(window.devicePixelRatio, 1 / 3) || 1.6,
         d = 1E3 / 15,
         e = [NaN, NaN, null],
-    //5点计算法
+
+        //5点计算法?
         f = function (a, b, c, d, e, f) {
             var g = 1 - a, h = 1 - b, k = g * h, h = a * h, g = g * b;
             a *= b;

@@ -223,48 +223,164 @@ function testFind() {
         return a;
     }
 }
-testLoad();
-//测试载入数据
-function testLoad() {
-    var m_Json = require("../../api/data/wind/current-wind-surface-level-gfs-1.0.json");
-    var m_Header = m_Json[1].header;
-    var Δλ = m_Header.dx, Δφ = m_Header.dy;
-    console.log(m_Header);
-    var m_Data = m_Json[1].data;
-    console.log(m_Data.length);
-    var m_Min = 300;
-    var m_Max = 0;
-    var m_Min_i = 0;
-    var m_Max_i = 0;
-    var m_unNull_Num = 0;
-    for (let i = 0; i < m_Data.length; i++) {
-        //计算非空值
-        if (m_Data[i] == null) {
-            continue;
-        }
-        else {
-            m_unNull_Num++;
-        }
-        //计算 最大值 最小值
-        if (m_Data[i] > m_Max) {
-            m_Max = m_Data[i];
-            m_Max_i = i;
-        } else if (m_Data[i] < m_Min) {
-            m_Min = m_Data[i];
-            m_Min_i = i;
-        }
-    }
-    var m_PreSent = m_unNull_Num / m_Data.length;
-    console.log("非空值的总数:" + m_unNull_Num + "/" + m_Data.length + "  \n有效值百分比：  " + m_PreSent + "%");
-    //计算最大值经纬度
-    var m_MaxLon = m_Max_i % 344 * Δλ;
-    var m_MaxLat = Math.floor(m_Max_i / 344) * Δλ;
-    console.log("最大值:" + m_Max + ":" + m_Max_i);
-    console.log("最大值经纬度:" + m_MaxLon + "," + m_MaxLat);
-    //计算最大值经纬度
-    var m_MinLon = m_Min_i % 344 * Δλ;
-    var m_MinLat = Math.floor(m_Min_i / 344) * Δλ;
-    console.log("最小值:" + m_Min);
-    console.log("最小值经纬度:" + m_MinLon + "," + m_MinLat);
 
+var m_json = "../../api/data/wind/web/current-wind-surface-level-gfs-1.0.json";
+console.log("json ");
+var param = {};
+param.require_path = m_json;
+var m_product = product(param);
+
+function product(param) {
+    var require_path = param.require_path;
+
+    var init = function () {
+        BasicLoad(require_path);
+        testUData(require_path);
+        testVData(require_path);
+
+    };
+
+    var BasicLoad = function (require_path) {
+        console.log("=============基础信息==============");
+
+        var m_Json = require(require_path);
+        var m_Header = m_Json[1].header;
+
+        var params = {};
+
+        params.refTime = m_Header.refTime;
+        params.nx = m_Header.nx;
+        params.ny = m_Header.ny;
+
+        params.lo1 = m_Header.lo1;
+        params.la1 = m_Header.la1;
+        params.lo2 = m_Header.lo2;
+        params.la2 = m_Header.la2;
+        params.dx = m_Header.dx;
+        params.dy = m_Header.dy;
+        console.log(params);
+        var m_DataNum = m_Header.nx * m_Header.ny;
+        console.log("总数：" + m_Header.nx + " * " + m_Header.ny + " = " + m_DataNum);
+    };
+
+
+//测试载入速度数据
+    function testVData(require_path) {
+        console.log("=============V_Data==============");
+        var m_Json = require(require_path);
+        var m_Header = m_Json[1].header;
+        var nx = m_Header.nx;
+        var Δλ = m_Header.dx, Δφ = m_Header.dy;
+        var m_Data = m_Json[1].data;
+        var m_Min = 300;
+        var m_Max = 0;
+        var m_Min_i = 0;
+        var m_Max_i = 0;
+        var m_unNull_Num = 0;
+        for (let i = 0; i < m_Data.length; i++) {
+            //计算非空值
+            if (m_Data[i] == null) {
+                continue;
+            }
+            else {
+                m_unNull_Num++;
+            }
+
+            //计算 最大值 最小值
+            if (m_Data[i] > m_Max) {
+                m_Max = m_Data[i];
+                m_Max_i = i;
+            } else if (m_Data[i] < m_Min) {
+                m_Min = m_Data[i];
+                m_Min_i = i;
+            }
+        }
+        var m_PreSent = m_unNull_Num / m_Data.length * 100;
+
+
+        console.log("非空值的总数:" + m_unNull_Num + "/" + m_Data.length + "  \n有效值百分比：  " + m_PreSent + "%");
+        //计算最大值经纬度
+        var m_MaxLon = m_Max_i % nx * Δλ;
+        var m_MaxLat = Math.floor(m_Max_i / nx) * Δφ;
+        console.log("最大值:" + m_Max + ",最大值位置" + m_Max_i);
+        console.log("最大值经纬度:" + m_MaxLon + "," + m_MaxLat);
+        //计算最大值经纬度
+        var m_MinLon = m_Min_i % nx * Δλ;
+        var m_MinLat = Math.floor(m_Min_i / nx) * Δφ;
+        console.log("最小值:" + m_Min+ ",最小值位置" + m_Min_i);
+        console.log("最小值经纬度:" + m_MinLon + "," + m_MinLat);
+
+    }
+
+//测试 方向
+    function testUData(require_path) {
+        console.log("=============U_Data==============");
+        var m_Json = require(require_path);
+        var m_Header = m_Json[0].header;
+        var nx = m_Header.nx, ny = m_Header.ny;
+        var Δλ = m_Header.dx, Δφ = m_Header.dy;
+        var m_Data = m_Json[0].data;
+        var m_Min = 300;
+        var m_Max = 0;
+        var m_Min_i = 0;
+        var m_Max_i = 0;
+        var m_unNull_Num = 0;
+        var m_0Num = 0;
+        var m_90Num = 0;
+        var m_180Num = 0;
+        var m_270Num = 0;
+        var m_90NumOnly = 0;
+        for (let i = 0; i < m_Data.length; i++) {
+            //计算非空值
+            if (m_Data[i] == null) {
+                continue;
+            }
+            else {
+                m_unNull_Num++;
+            }
+            if (m_Data[i] < -5) {
+                m_0Num++;
+            }
+            if (m_Data[i] >= -5 && m_Data[i] < 0) {
+                m_90Num++;
+            }
+            if (m_Data[i] >= 0 && m_Data[i] < 5) {
+                m_180Num++;
+            }
+            if (m_Data[i] >= 5) {
+                m_270Num++;
+            }
+            //计算 最大值 最小值
+            if (m_Data[i] > m_Max) {
+                m_Max = m_Data[i];
+                m_Max_i = i;
+            } else if (m_Data[i] < m_Min) {
+                m_Min = m_Data[i];
+                m_Min_i = i;
+            }
+        }
+        var m_PreSent = m_unNull_Num / m_Data.length * 100;
+        console.log("方向分布范围: ~-10：-10~0：0~10：10~");
+        console.log("方向分布比例:" + m_0Num + ":" + m_90Num + ":" + m_180Num + ":" + m_270Num);
+        console.log("非空值的总数:" + m_unNull_Num + "/" + m_Data.length + "  \n有效值百分比：  " + m_PreSent + "%");
+        //计算最大值经纬度
+        var m_MaxLon = m_Max_i % nx * Δλ;
+        var m_MaxLat = Math.floor(m_Max_i / nx) * Δφ;
+        console.log("最大值:" + m_Max + ",最大值位置" + m_Max_i);
+        console.log("最大值经纬度:" + m_MaxLon + "," + m_MaxLat);
+        //计算最大值经纬度
+        var m_MinLon = m_Min_i % nx * Δλ;
+        var m_MinLat = Math.floor(m_Min_i / nx) * Δφ;
+        console.log("最小值:" + m_Min + ",最小值位置" + m_Min_i);
+        console.log("最小值经纬度:" + m_MinLon + "," + m_MinLat);
+    }
+
+
+    init();
+
+    return this;
 }
+
+
+
+
