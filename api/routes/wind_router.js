@@ -14,12 +14,11 @@
          * 获取json格式的data 信息
          */
         server.get({
-            path: BASEPATH + '/earthdata/wind/:date/:prodname',
+            path: BASEPATH + '/earthdata/wind/:date/:level/:prodname',
             version: '0.0.1'
         }, wind_module._getwindjson);
-    }
 
-    module.exports = function (server, BASEPATH) {
+
         /**
          * 获取json格式的data 信息
          */
@@ -29,5 +28,4 @@
         }, wind_module._getwinddatalist);
     }
 
-})
-();
+})();

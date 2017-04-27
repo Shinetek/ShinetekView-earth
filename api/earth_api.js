@@ -19,16 +19,21 @@
     var server = restify.createServer({
         name: 'earth_api'
     });
-    server.use(restify.queryParser());
-    server.use(restify.CORS());
-    server.use(
-        function crossOrigin(req, res, next) {
-            'use strict';
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "X-Requested-With");
-            return next();
-        });
+    /*   server.use(restify.queryParser());
+     server.use(restify.CORS());*/
 
+    server.use(restify.queryParser());
+    server.use(restify.bodyParser());
+    server.use(restify.CORS());
+    /*
+     server.use(
+     function crossOrigin(req, res, next) {
+     'use strict';
+     res.header("Access-Control-Allow-Origin", "*");
+     res.header("Access-Control-Allow-Headers", "X-Requested-With");
+     return next();
+     });
+     */
     var BASEPATH = "/api";
 
     /**
@@ -36,8 +41,11 @@
      **/
     require('./routes/wind_router.js')(server, BASEPATH);
 
+    //洋流数据
+    require('./routes/oscar_router.js')(server, BASEPATH);
     //地球数据
     require('./routes/earth_router.js')(server, BASEPATH);
+
 
     server.listen(port, function () {
         console.log('%s listening at %s ', server.name, server.url);

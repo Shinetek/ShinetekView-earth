@@ -223,21 +223,25 @@ function testFind() {
         return a;
     }
 }
+var fs = require("fs");
+var m_json1 = "../../api/data/wind/20170419231000/AHI8-_AGRI--_N_DISK_1407E_L2-_AMV-_C018_NUL_20170419231000_20170419232000_064KM_V0001.json";
+var m_json = "../../api/data/wind/current-wind-surface-level-gfs-1.0.json";
 
-var m_json = "../../api/data/wind/web/current-wind-surface-level-gfs-1.0.json";
+
 console.log("json ");
 var param = {};
 param.require_path = m_json;
 var m_product = product(param);
+
 
 function product(param) {
     var require_path = param.require_path;
 
     var init = function () {
         BasicLoad(require_path);
-        testUData(require_path);
         testVData(require_path);
-
+        testUData(require_path);
+        // setNewJson(require_path);
     };
 
     var BasicLoad = function (require_path) {
@@ -307,7 +311,7 @@ function product(param) {
         //计算最大值经纬度
         var m_MinLon = m_Min_i % nx * Δλ;
         var m_MinLat = Math.floor(m_Min_i / nx) * Δφ;
-        console.log("最小值:" + m_Min+ ",最小值位置" + m_Min_i);
+        console.log("最小值:" + m_Min + ",最小值位置" + m_Min_i);
         console.log("最小值经纬度:" + m_MinLon + "," + m_MinLat);
 
     }
@@ -375,6 +379,43 @@ function product(param) {
         console.log("最小值经纬度:" + m_MinLon + "," + m_MinLat);
     }
 
+    function setNewJson(require_path) {
+        var m_Json = require(require_path);
+        var m_ARCLIST = m_Json[0].data;
+        var m_SPEEDLIST = m_Json[1].data;
+        var m_length = m_ARCLIST.length;
+        var m_UGRD = [];
+        var m_VGRD = [];
+        if (m_ARCLIST.length == m_SPEEDLIST.length) {
+            for (var i = 0; i < m_length; i++) {
+                if (m_ARCLIST[i] && m_SPEEDLIST[i]) {
+                    var m_u = Math.cos(m_ARCLIST[i] * (2 * Math.PI / 360)) * m_SPEEDLIST[i];
+                    var m_v = Math.sin(m_ARCLIST[i] * (2 * Math.PI / 360)) * m_SPEEDLIST[i];
+                    m_UGRD.push(m_u);
+                    m_VGRD.push(m_v);
+                } else {
+                    m_UGRD.push(null);
+                    m_VGRD.push(null);
+                }
+            }
+        }
+
+        m_Json[0].data = m_UGRD;
+        m_Json[1].data = m_VGRD;
+        writeJson(m_Json);
+    }
+
+    function writeJson(data) {
+
+        var jsonObj = JSON.stringify(data);
+
+        fs.writeFile('./result.json', jsonObj, function (err) {
+            if (err) throw err;
+            console.log('write JSON into result.json');
+        });
+
+
+    }
 
     init();
 

@@ -1,4 +1,5 @@
 {
-  "WIND_FILEPATH": "D://GitHub//Shinetek_earth//ShinetekView-earth//api//data//wind//latlon//",
+  "WIND_FILEPATH": "D://GitHub//Shinetek_earth//ShinetekView-earth//api//data//wind//",
+  "OSCAR_FILEPATH": "D://GitHub//Shinetek_earth//ShinetekView-earth//api//data//oscar//",
   "WIND_NAMEREG": ""
 }

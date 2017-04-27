@@ -49,10 +49,10 @@
                 id="toggle-zone" class="text-button"></span>
         </p>
         <p>数据 | <span id="data-layer"></span></p>
-        <p><span id="scale-label">调色板 | </span>
+        <p><span id="scale-label">范围 | </span>
             <canvas id="scale"></canvas>
         </p>
-        <p>控制 | <span
+        <p>管理 | <span
                 class="text-button" id="nav-now" title="Current Conditions">Now</span><span
                 class="text-button" id="nav-backward-more"> « </span> – <span
                 class="text-button" id="nav-backward"> ‹ </span> – <span
@@ -64,7 +64,7 @@
                 class="text-button" id="wind-mode-enable">风</span> – <span
                 class="text-button" id="ocean-mode-enable">洋流</span>
         </p>
-        <p class="wind-mode">风场高度 | <span
+        <p class="wind-mode" style="display: none;">高度 | <span
                 class="surface text-button" id="surface-level" title="Surface">Sfc</span> – <span
                 class="surface text-button" id="isobaric-1000hPa">1000</span> – <span
                 class="surface text-button" id="isobaric-850hPa">850</span> – <span
@@ -74,12 +74,12 @@
                 class="surface text-button" id="isobaric-70hPa">70</span> – <span
                 class="surface text-button" id="isobaric-10hPa">10</span> hPa
         </p>
-        <p class="wind-mode">表面图层 | <span
+        <p class="wind-mode">覆盖| <span
                 class="text-button" id="overlay-off">None</span> – <span
-                class="text-button" id="overlay-wind" title="Wind Speed">Wind</span> – <span
-                class="text-button" id="overlay-temp" title="Temperature">Temp</span> – <span
-                class="text-button" id="overlay-relative_humidity" title="Relative Humidity">RH</span> – <span
-                class="text-button" id="overlay-air_density" title="Air Density">AD</span> – <span
+                class="text-button" id="overlay-wind" title="Wind Speed">风速</span> – <span
+                class="text-button" id="overlay-temp" title="Temperature">温度</span> – <span
+                class="text-button" id="overlay-relative_humidity" title="Relative Humidity">相对湿度</span> – <span
+                class="text-button" id="overlay-air_density" title="Air Density">空气密度</span> – <span
                 class="text-button" id="overlay-wind_power_density" title="Wind Power Density">WPD</span>
         </p>
         <p class="wind-mode"><span style="visibility:hidden">Overlay</span> | <span

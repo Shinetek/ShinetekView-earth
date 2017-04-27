@@ -16,6 +16,7 @@
      * @private
      */
     var _getwindjson = function (req, res, next) {
+        console.log("_getwindjson");
         //获取参数配置
         var m_date = req.params.date;
         // var m_procbname = req.params.prodname;
@@ -25,13 +26,15 @@
         var m_LOCALPATH = (path.resolve(path.resolve('.') + '/data/wind/'));
         //判断为配置目录是否合法
         var m_WIND_FILEPATH = m_config.WIND_FILEPATH ? m_config.WIND_FILEPATH : m_LOCALPATH;
+
         var m_procbname = "current-wind-surface-level-gfs-1.0.json";
 
 
         //正确性校验
         if (m_procbname.toString().indexOf('json') > 0 && m_date != undefined) {
             //todo 修改路径查找匹配
-            var m_path = (path.resolve(path.resolve('.') + '/data/wind/' + m_procbname));
+            // var m_path = (path.resolve(path.resolve('.') + '/data/wind/' + m_procbname));
+            var m_path = m_WIND_FILEPATH + "//" + m_procbname;
             var data = fs.readFileSync(m_path);
             res.end(data);
             next();

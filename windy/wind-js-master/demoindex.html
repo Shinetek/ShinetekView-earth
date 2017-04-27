@@ -9,10 +9,50 @@
     <canvas id="m_map"></canvas>
 </div>
 </body>
+<script src="./js/jquery.min.js"></script>
 <script src="./windy.js"></script>
 <script>
-    var map_canvas = document.getElementById("m_map");
-    var m_response = "";
-    var windy = new Windy({canvas: map_canvas, data: response});
+
+
+    initMap();
+    function initMap() {
+        var map_canvas = document.getElementById("m_map");
+        $.ajax({
+            type: 'GET',
+            url: "http://10.24.4.121:8889/api/earthdata/wind/20170412/1212",
+
+            contentType: "application/json",
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                var windy = new Windy({canvas: map_canvas, data: data});
+                redraw(windy);
+            },
+            error: function (err) {
+                console.log(err);
+            },
+            dataType: "json"
+        });
+
+        function redraw(windy) {
+
+            map_canvas.width = 1920;
+            map_canvas.height = 1080;
+            /*   rasterLayer._element.width = map.width;
+             rasterLayer._element.height = map.height;
+             */
+            windy.stop();
+
+
+            setTimeout(function () {
+                windy.start(
+                        [[0, 0], [1920, 1080]],
+                        1920,
+                        1080,
+                        [[0, 0], [1920, 1080]]
+                );
+            }, 500);
+        }
+
+    }
 </script>
 </html>

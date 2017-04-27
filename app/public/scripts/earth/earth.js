@@ -25,7 +25,8 @@
     var INTENSITY_SCALE_STEP = 10;            // step size of particle intensity color scale  比例尺颜色间隔
     var MAX_PARTICLE_AGE = 20;               // max number of frames a particle is drawn before regeneration  最大粒子间隔 100？todo
     var PARTICLE_LINE_WIDTH = 1.0;            // line width of a drawn particle
-    var PARTICLE_MULTIPLIER = 10;              // particle count scalar (completely arbitrary--this values looks nice) 粒子个数
+    //决定界面显示中 粒子的疏密
+    var PARTICLE_MULTIPLIER = 20;              // particle count scalar (completely arbitrary--this values looks nice) 粒子个数
     var PARTICLE_REDUCTION = 0.75;            // reduce particle count to this much of normal for mobile devices
     var FRAME_RATE = 20;                      // desired milliseconds per frame 每一帧的刷新毫秒数
 
@@ -485,19 +486,23 @@
          *          ocean currents.
          */
         field.isInsideBoundary = function (x, y) {
+            //是否在边界内
+            //返回true false
             return field(x, y) !== NULL_WIND_VECTOR;
         };
 
         // Frees the massive "columns" array for GC. Without this, the array is leaked (in Chrome) each time a new
         // field is interpolated because the field closure's context is leaked, for reasons that defy explanation.
+        //对 columns 进行初始化 为[] 的操作
         field.release = function () {
             columns = [];
         };
 
-        //随机函数？
+        //随机函数
         field.randomize = function (o) {  // UNDONE: this method is terrible
             var x, y;
             var safetyNet = 0;
+            //循环30次 在bounds 中 查找一个存在的xy
             do {
                 x = Math.round(_.random(bounds.x, bounds.xMax));
                 y = Math.round(_.random(bounds.y, bounds.yMax));
@@ -784,6 +789,8 @@
             var colorBar = d3.select("#scale"), scale = grid.scale, bounds = scale.bounds;
             var c = colorBar.node(), g = c.getContext("2d"), n = c.width - 1;
             for (var i = 0; i <= n; i++) {
+                // a 为　透明度
+                //   console.log(µ.spread(i / n, bounds[0], bounds[1]));
                 var rgb = scale.gradient(µ.spread(i / n, bounds[0], bounds[1]), 1);
                 g.fillStyle = "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
                 g.fillRect(i, 0, 1, c.height);

@@ -9,16 +9,19 @@
 var products = function () {
     "use strict";
 
+    var BASICURL = "http://10.24.4.121:8889/api/earthdata";
 
     //调用api的URL 拼接 等级 年月日
-    var APIURL = "http://10.24.4.121:8889/api/earthdata/wind/";
+    var APIURL = "http://10.24.4.121:8889/api/earthdata";
     //天气 路径
     var WEATHER_PATH = "/data/weather";
     // var OSCAR_PATH = "/data/oscar";
-    var OSCAR_PATH = "http://10.24.4.121:8889/api/earthdata/wind/20170412/";
+    var OSCAR_PATH = "http://10.24.4.121:8889/api/earthdata/oscar/level/20170412";
+    //洋流数据 为一组 数据
     var catalogs = {
         // The OSCAR catalog is an array of file names, sorted and prefixed with yyyyMMdd. Last item is the
         // most recent. For example: [ 20140101-abc.json, 20140106-abc.json, 20140112-abc.json, ... ]
+        //是一组数据 包含很多个json
         oscar: µ.loadJson([OSCAR_PATH, "catalog.json"].join("/"))
     };
 
@@ -51,14 +54,10 @@ var products = function () {
     function gfs1p0degPath(attr, type, surface, level) {
         var dir = attr.date, stamp = dir === "current" ? "current" : attr.hour;
         var file = [stamp, type, surface, level, "gfs", "1.0"].filter(µ.isValue).join("-") + ".json";
-        //return
-        var m_Loacl = APIURL;
-        //  return [WEATHER_PATH, dir, file].join("/");
-        var m_path = [m_Loacl, "20170412", file].join("/");
-        //返回指定URL
-        console.log(m_path);
-
-        return [m_Loacl, "20170412", file].join("/");
+        //return [WEATHER_PATH, dir, file].join("/");
+        //var m_path = [BASICURL, type, surface, "20170412", file].join("/");
+        //返回指定 URL
+        return [BASICURL, type, surface, "20170412", file].join("/");
     }
 
     //计算gfs 的时间 todo 根据实际修改 有可能用不到
@@ -103,7 +102,7 @@ var products = function () {
     }
 
     function describeSurfaceJa(attr) {
-        return attr.surface === "surface" ? "地上" : µ.capitalize(attr.level);
+        return attr.surface === "surface" ? "地表" : µ.capitalize(attr.level);
     }
 
     /**
@@ -134,7 +133,7 @@ var products = function () {
                     field: "vector",
                     type: "wind",
                     description: localize({
-                        name: {en: "Wind", ja: "風速"},
+                        name: {en: "Wind", ja: "风速"},
                         qualifier: {en: " @ " + describeSurface(attr), ja: " @ " + describeSurfaceJa(attr)}
                     }),
                     paths: [gfs1p0degPath(attr, "wind", attr.surface, attr.level)],
@@ -145,28 +144,26 @@ var products = function () {
                             header: file[0].header,
                             interpolate: bilinearInterpolateVector,
                             data: function (i) {
-                                var m_u = null;
-                                if (µ.isValue(uData[i])) {
-                                    //m_u = -uData[i] / 30;
-                                    m_u = (180 + uData[i]) % 360;
-                                    if (m_u >= 90 && m_u < 270) {
-                                        m_u = -(m_u / 20);
-                                    }
-                                    else {
-                                        m_u = (m_u / 20);
-                                    }
-                                }
+                                //todo 修改算法
                                 var m_v = null;
-                                if (µ.isValue(m_u)) {
-                                    if (uData[i] < 360 && uData[i] >= 180) {
-                                        m_v = -vData[i];
-                                    }
+                                var m_u = null;
+                                if (uData[i] && vData[i]) {
+
+                                    var arc = (270 - uData[i]) * Math.PI / 180;
+                                    //分别去cos sin 和 速度的乘积 为 U V GRD的向量
+                                    m_u = Math.cos(arc) * vData[i];
+                                    m_v = Math.sin(arc) * vData[i];
+                                    //添加入列表
+                                    /*  m_u = Math.cos(uData[i] * (2 * Math.PI / 360)) * vData[i];
+                                     m_v = Math.sin(uData[i] * (2 * Math.PI / 360)) * vData[i];*/
                                 }
                                 return [m_u, m_v];
-                                // return [uData[i], vData[i]];
+                                //
+                                //   return [uData[i], vData[i]];
                             }
                         }
                     },
+                    //单位转化
                     units: [
                         {
                             label: "km/h", conversion: function (x) {
@@ -191,7 +188,25 @@ var products = function () {
                     ],
                     scale: {
                         bounds: [0, 100],
+                        //
+                        /*   gradient: function (v, a) {
+                         return µ.extendedSinebowColor(Math.min(v, 100) / 100, a);
+                         }*/
+                        /*    gradient: function (v, a) {
+                         return µ.segmentedColorScale([
+                         [0, [255, 0, 0]],
+                         [30, [255, 152, 0]],
+                         [60, [255, 255, 0]],
+                         [90, [152, 255, 0]],  // -40 C/F
+                         [120, [0, 152, 255]],  // 0 F
+                         [150, [152, 152, 255]],   // 0 C
+                         [180, [255, 152, 255]],   // just above 0 C
+                         [210, [255, 255, 152]],
+                         [240, [152, 255, 255]],
+                         [270, [255, 255, 255]]]);
+                         }*/
                         gradient: function (v, a) {
+                            // console.log(v)
                             return µ.extendedSinebowColor(Math.min(v, 100) / 100, a);
                         }
                     },
@@ -207,7 +222,7 @@ var products = function () {
                     field: "scalar",
                     type: "temp",
                     description: localize({
-                        name: {en: "Temp", ja: "気温"},
+                        name: {en: "Temp", ja: "气温"},
                         qualifier: {en: " @ " + describeSurface(attr), ja: " @ " + describeSurfaceJa(attr)}
                     }),
                     paths: [gfs1p0degPath(attr, "temp", attr.surface, attr.level)],
@@ -307,7 +322,7 @@ var products = function () {
                     field: "scalar",
                     type: "air_density",
                     description: localize({
-                        name: {en: "Air Density", ja: "空気密度"},
+                        name: {en: "Air Density", ja: "空气密度"},
                         qualifier: {en: " @ " + describeSurface(attr), ja: " @ " + describeSurfaceJa(attr)}
                     }),
                     paths: [gfs1p0degPath(attr, "air_density", attr.surface, attr.level)],

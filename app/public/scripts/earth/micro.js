@@ -239,6 +239,7 @@ var µ = function () {
     }
 
     var BOUNDARY = 0.45;
+    //渐进到白色
     var fadeToWhite = colorInterpolator(sinebowColor(1.0, 0), [255, 255, 255]);
 
     /**
